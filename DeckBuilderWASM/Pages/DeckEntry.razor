@@ -1,0 +1,50 @@
+﻿@page "/"
+@page "/welcome"
+@page "/deckentry"
+@using DeckBuilderWASM.POCOs
+@inject Container container;
+@inject NavigationManager navigation;
+@inject HttpClient Http
+
+
+<h3>DeckEntry</h3>
+<div class="container-fluid">
+    <button class="btn btn-secondary btn-sm" @onclick="OkButtonClick">OK</button>
+    <form>
+        <div class="form-group">
+            <label for="exampleTextarea">Example textarea</label>
+            <textarea class="form-control" id="exampleTextarea" @bind="deckinput" rows="100" placeholder="Enter your text here..."></textarea>
+        </div>
+        <button class="btn btn-secondary btn-sm" @onclick="OkButtonClick">OK</button>
+    </form>
+</div>
+
+
+
+@code {
+    string deckinput;
+
+    List<string> imageUrls;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var result = await Http.GetFromJsonAsync<ApiCardResult>($"https://api.scryfall.com/cards/named?exact=austere command");
+        }
+        catch (Exception e)
+        {
+            
+            throw;
+        }
+    }
+
+
+    private void OkButtonClick()
+    {
+        if (String.IsNullOrWhiteSpace(deckinput))
+            return;
+        container.Input = deckinput;
+        navigation.NavigateTo("/deckview");
+    }
+}

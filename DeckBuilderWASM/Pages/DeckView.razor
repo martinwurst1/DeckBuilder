@@ -1,0 +1,56 @@
+﻿@page "/deckview"
+@using DeckBuilderWASM.POCOs
+@inject HttpClient Http;
+@inject Container container;
+
+<div class="container">
+    @if (problems.Count > 0){
+        <div class="row">
+            <div class="h6">Folgende Karten wurden nicht gefunden:</div>
+        </div>
+    }
+
+    <div class="row">
+        @foreach (var card in this.cards)
+        {
+            <div class="col-md-3 mb-3">
+                <DeckBuilderWASM.Components.CardSelection Card="@card"/>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    List<Card> cards = new();
+    List<string> problems = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var split = container.Input.Split(['\n']).Select(GetCorrectedInput);
+        foreach (var card in split)
+        {
+            if (String.IsNullOrEmpty(card))
+                continue;
+            try
+            {
+                var result = await Http.GetFromJsonAsync<ApiCardResult>($"https://api.scryfall.com/cards/named?exact={card}");
+                if (result != null)
+                    cards.Add(new Card(result, card));
+                else
+                    problems.Add(card);
+                await Task.Delay(100);
+                if (cards.Count % 4 == 0)
+                    StateHasChanged();
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
+            StateHasChanged();
+        }
+    }
+
+    private static string GetCorrectedInput(string input){
+        return input.Replace("'", String.Empty).Replace(",", String.Empty).Trim();
+    }
+}
