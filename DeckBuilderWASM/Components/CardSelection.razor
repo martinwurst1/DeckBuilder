@@ -1,7 +1,7 @@
 ﻿@using DeckBuilderWASM.POCOs
 @inject HttpClient Http;
 
-<button type="button" @onclick="async () => await LoadAlternativeArts()" data-toggle="modal" data-target="#altArtModal">
+<button type="button" style="border: none;background: none" @onclick="async () => await LoadAlternativeArts()" data-toggle="modal" data-target="#altArtModal">
     <img src="@Card.SelectedVersion.ImageUris.Normal" class="img-fluid rounded" alt="Image">
 </button>
 
@@ -10,9 +10,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Alternative Prints</h5>
-                <button type="button" class="close" @onclick="() => Close()" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="() => Close()">Close</button>
             </div>
             <div class="modal-body">
                 @if (this.Card.ArtSearchResult != null && this.Card.ArtSearchResult.Count > 0)
@@ -21,7 +19,7 @@
                     {
                         <div class="row">
                             <div class="col-md-6 mb-6">
-                                <button type="button" @onclick="() => SetSelectedArt(altArt)" data-toggle="modal">
+                                <button type="button" style="border: none;background: none" @onclick="() => SetSelectedArt(altArt)" data-toggle="modal">
                                     <img src="@altArt.ImageUris.Normal" class="img-fluid rounded" alt="Image">
                                 </button>
                             </div>
@@ -39,12 +37,10 @@
     </div>
 </div>
 
-
 @if (ShowBackdrop)
 {
     <div class="modal-backdrop fade show"></div>
 }
-
 
 @code {
 

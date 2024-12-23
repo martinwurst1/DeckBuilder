@@ -1,7 +1,10 @@
 ﻿@page "/deckview"
 @using DeckBuilderWASM.POCOs
-@inject HttpClient Http;
-@inject Container container;
+@using System.Text.Json;
+@using System.IO
+@inject IJSRuntime JS
+@inject HttpClient Http
+@inject Container container
 
 <div class="container">
     @if (problems.Count > 0){
@@ -17,6 +20,11 @@
                 <DeckBuilderWASM.Components.CardSelection Card="@card"/>
             </div>
         }
+    </div>
+    <div class="row">
+        <div class="col-md 2 mb-2">
+            <div class="button" @onclick="() => Save()">Speichern</div>
+        </div>
     </div>
 </div>
 
@@ -49,6 +57,29 @@
             StateHasChanged();
         }
     }
+
+    private async Task Save(){
+        // await DownloadFileFromStream();
+
+    }
+
+
+    // private Stream GetFileStream()
+    // {
+    //     var s = JsonSerializer.SerializeToUtf8Bytes(container);
+    //     using var stream = new MemoryStream(s);
+    //     return stream;
+    // }
+
+    // private async Task DownloadFileFromStream()
+    // {
+    //     var fileStream = GetFileStream();
+    //     var fileName = "Deckliste.json";
+
+    //     using var streamRef = new DotNetStreamReference(stream: fileStream);
+
+    //     await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+    // }
 
     private static string GetCorrectedInput(string input){
         return input.Replace("'", String.Empty).Replace(",", String.Empty).Trim();

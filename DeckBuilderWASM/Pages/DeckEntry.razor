@@ -7,13 +7,13 @@
 @inject HttpClient Http
 
 
-<h3>DeckEntry</h3>
+<h3>Deck Eingabe</h3>
 <div class="container-fluid">
     <button class="btn btn-secondary btn-sm" @onclick="OkButtonClick">OK</button>
     <form>
         <div class="form-group">
-            <label for="exampleTextarea">Example textarea</label>
-            <textarea class="form-control" id="exampleTextarea" @bind="deckinput" rows="100" placeholder="Enter your text here..."></textarea>
+            <label for="exampleTextarea">Deckliste eingeben: z.B. 1 Shivan Dragon</label>
+            <textarea class="form-control" id="exampleTextarea" @bind="deckinput" rows="100"></textarea>
         </div>
         <button class="btn btn-secondary btn-sm" @onclick="OkButtonClick">OK</button>
     </form>
