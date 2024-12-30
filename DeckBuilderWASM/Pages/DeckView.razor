@@ -2,6 +2,7 @@
 @using DeckBuilderWASM.POCOs
 @using System.Text.Json;
 @using System.IO
+@using System.Reflection.Metadata
 @inject IJSRuntime JS
 @inject HttpClient Http
 @inject Container container
@@ -23,7 +24,10 @@
     </div>
     <div class="row">
         <div class="col-md 2 mb-2">
-            <div class="button" @onclick="() => Save()">Speichern</div>
+            <button class="btn btn-secondary btn-sm" @onclick="() => Save()">Speichern</button>
+        </div>
+        <div class="col-md 2 mb-2">
+            <button class="btn btn-secondary btn-sm" @onclick="() => ExportPictures()">Export</button>
         </div>
     </div>
 </div>
@@ -41,9 +45,15 @@
                 continue;
             try
             {
-                var result = await Http.GetFromJsonAsync<ApiCardResult>($"https://api.scryfall.com/cards/named?exact={card}");
+                if (!Int32.TryParse(card.Trim().Substring(0,1), out var anzahl))
+                {
+                    problems.Add(card);
+                    continue;
+                }
+                var name = GetCorrectedInput(card.Substring(1));
+                var result = await Http.GetFromJsonAsync<ApiCardResult>($"https://api.scryfall.com/cards/named?exact={name}");
                 if (result != null)
-                    cards.Add(new Card(result, card));
+                    cards.Add(new Card(result, name, anzahl));
                 else
                     problems.Add(card);
                 await Task.Delay(100);
@@ -54,22 +64,59 @@
             {
                 throw;
             }
-            StateHasChanged();
+        }
+        container.Data = cards;
+        StateHasChanged();
+    }
+
+    private async Task ExportPictures(){
+        foreach(var chunk in this.cards.Chunk(2)){
+            var imageUrl1 = chunk[0].SelectedVersion.ImageUris.Normal;
+            var imageUrl2 = chunk[1].SelectedVersion.ImageUris.Normal;
+            if (imageUrl1 != null && imageUrl2 != null)
+            {
+                try
+                {
+
+                    var imagestream1 = await Http.GetByteArrayAsync(imageUrl1);
+                }
+                catch (Exception e)
+                {
+                    throw;
+                }
+                var imagestream2 = await Http.GetByteArrayAsync(imageUrl2);
+                // Beide Bilder mit ImageSharp bearbeiten
+                // var resultImageUrl = await ProcessImagesWithImageSharp(imageUrl1, imageUrl2);
+
+                // // Das Ergebnisbild anzeigen
+                // var resultImage = document.getElementById("resultImage") as HTMLImageElement;
+                // resultImage.src = resultImageUrl;
+            }
         }
     }
 
     private async Task Save(){
-        // await DownloadFileFromStream();
+        var fileName = "text.json";
+        var byteArray = JsonSerializer.SerializeToUtf8Bytes(container);
+        var blob = await JS.InvokeAsync<IJSObjectReference>("createBlob", byteArray);
+        // Erstellen Sie einen Download-Link
+        var url = await JS.InvokeAsync<string>("URL.createObjectURL", blob);
+
+        // Erzeugen Sie den Download-Link
+        await JS.InvokeVoidAsync("downloadFile", url, fileName);
+
+        // Optional: Bereinigen Sie den Blob-URL, wenn er nicht mehr benötigt wird
+        await JS.InvokeVoidAsync("URL.revokeObjectURL", url);
 
     }
 
 
-    // private Stream GetFileStream()
-    // {
-    //     var s = JsonSerializer.SerializeToUtf8Bytes(container);
-    //     using var stream = new MemoryStream(s);
-    //     return stream;
-    // }
+    private Stream GetFileStream()
+    {
+        var s = JsonSerializer.SerializeToUtf8Bytes(container);
+        using var stream = new MemoryStream(s);
+        return stream;
+    }
 
     // private async Task DownloadFileFromStream()
     // {

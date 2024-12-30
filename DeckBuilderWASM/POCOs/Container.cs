@@ -4,6 +4,6 @@
     {
         public string Input { get; set; }
 
-        public List<object> Data { get; } = new();
+        public List<Card> Data { get; set; } = new();
     }
 }

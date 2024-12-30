@@ -12,8 +12,9 @@
     <button class="btn btn-secondary btn-sm" @onclick="OkButtonClick">OK</button>
     <form>
         <div class="form-group">
-            <label for="exampleTextarea">Deckliste eingeben: z.B. 1 Shivan Dragon</label>
-            <textarea class="form-control" id="exampleTextarea" @bind="deckinput" rows="100"></textarea>
+            <label for="exampleTextarea" class="mt-2">Deckliste eingeben: z.B. 1 Shivan Dragon</label>
+            <input type="text" class="form-control mb-3" placeholder="Deckname" aria-label="Username" aria-describedby="basic-addon1">
+            <textarea class="form-control mb-3" id="exampleTextarea" @bind="deckinput" rows="100"></textarea>
         </div>
         <button class="btn btn-secondary btn-sm" @onclick="OkButtonClick">OK</button>
     </form>
@@ -23,22 +24,6 @@
 
 @code {
     string deckinput;
-
-    List<string> imageUrls;
-
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            var result = await Http.GetFromJsonAsync<ApiCardResult>($"https://api.scryfall.com/cards/named?exact=austere command");
-        }
-        catch (Exception e)
-        {
-            
-            throw;
-        }
-    }
-
 
     private void OkButtonClick()
     {

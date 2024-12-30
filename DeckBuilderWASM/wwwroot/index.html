@@ -4,6 +4,14 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--<meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        script-src 'self' https://api.scryfall.com;
+        style-src 'self';
+        img-src 'self' https://api.scryfall.com;
+        connect-src 'self' https://api.scryfall.com;
+        font-src 'self';
+    ">-->
     <title>DeckBuilderWASM</title>
     <base href="/" />
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
@@ -29,6 +37,20 @@
         <a class="dismiss">🗙</a>
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
+    <script>
+        window.createBlob = (byteArray) => {
+            return new Blob([new Uint8Array(byteArray)], { type: "text/plain" });
+        };
+
+        window.downloadFile = (url, filename) => {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        };
+    </script>
 </body>
 
 </html>
