@@ -22,14 +22,14 @@ namespace DeckBuilderWASM
             {
                 resultImage.Mutate(i => i.BackgroundColor(Color.White));
 
-                image1.Mutate(i => i.Resize(500, 700));
-                image2.Mutate(i => i.Resize(500, 700));
-
-                // Zeichne das erste Bild
+                image1.Mutate(i => i.Resize(500, 700));               
                 resultImage.Mutate(ctx => ctx.DrawImage(image1, new Point(aeussererAbstand, obererAbstand), 1f));
 
-                // Zeichne das zweite Bild nebeneinander
-                resultImage.Mutate(ctx => ctx.DrawImage(image2, new Point(image1.Width + aeussererAbstand + innererAbstand, obererAbstand), 1f));
+                if (image2 != null)
+                {
+                    image2.Mutate(i => i.Resize(500, 700));
+                    resultImage.Mutate(ctx => ctx.DrawImage(image2, new Point(image1.Width + aeussererAbstand + innererAbstand, obererAbstand), 1f));
+                }
 
                 resultImage.Save(outputStream, new JpegEncoder());
             }
@@ -39,6 +39,8 @@ namespace DeckBuilderWASM
 
         private static async Task<Image> GetImage(byte[] imageBytes)
         {
+            if (imageBytes == null)
+                return null;
             using var s = new MemoryStream(imageBytes);
             var image = await Image.LoadAsync(s);
             //image.Mutate(i => i.Rotate(RotateMode.Rotate90));

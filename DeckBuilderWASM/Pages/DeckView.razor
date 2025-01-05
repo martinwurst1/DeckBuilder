@@ -74,31 +74,23 @@
 
     private async Task ExportPictures(){
 
+        foreach(var card in this.cards.Where(c => c.Image == null || c.Image.Length == 0)){
+            card.Image = await Http.GetByteArrayAsync(card.SelectedVersion.ImageUris.Normal);
+            await Task.Delay(100);
+        }
 
+        var imagesToExport = new List<byte[]>();
 
-        foreach(var chunk in this.cards.Chunk(2)){
-            var imageUrl1 = chunk[0].SelectedVersion.ImageUris.Normal;
-            var imageUrl2 = chunk[1].SelectedVersion.ImageUris.Normal;
-            if (imageUrl1 != null && imageUrl2 != null)
-            {
-                byte[] imageStream1 = null;
-                byte[] imageStream2 = null ;
-                try
-                {
-                    // var rs = await Http.GetAsync(imageUrl1);
-                     imageStream1 = await Http.GetByteArrayAsync(imageUrl1);
-                }
-                catch (Exception e)
-                {
-                    throw;
-                }
-                imageStream2 = await Http.GetByteArrayAsync(imageUrl2);
+        foreach(var card in this.cards){
+            for (int i = 0; i < card.Anzahl; i++)
+                imagesToExport.Add(card.Image);
+        }
 
-                // var imagestream1 = Convert.FromBase64String(pic1);
-                // var imagestream2 = Convert.FromBase64String(pic2);
-
+        foreach (var chunk in imagesToExport.Chunk(2))
+        {
                 byte[] finalImage;
-                using (var resultStream = await ImageProcessor.ProcessImagesWithImageSharp(imageStream1, imageStream2))
+
+                using (var resultStream = await ImageProcessor.ProcessImagesWithImageSharp(chunk[0], chunk.Length > 1 ? chunk[1] : null))
                 {
                     finalImage = resultStream.ToArray();
                 }
@@ -106,7 +98,7 @@
                     await this.SaveFile(finalImage, "Pics.jpg");
             }
         }
-    }
+    
 
   
 

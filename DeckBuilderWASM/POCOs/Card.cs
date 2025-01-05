@@ -1,4 +1,6 @@
-﻿namespace DeckBuilderWASM.POCOs
+﻿using System.Text.Json.Serialization;
+
+namespace DeckBuilderWASM.POCOs
 {
     public class Card(ApiCardResult exactSearchResult, string name, int anzahl)
     {
@@ -11,5 +13,7 @@
         public string Name { get; } = name;
 
         public int Anzahl { get; set; } = anzahl;
+
+        public byte[] Image { get; set; }
     }
 }
