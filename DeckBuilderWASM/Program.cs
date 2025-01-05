@@ -17,10 +17,10 @@ namespace DeckBuilderWASM
                 BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
             };
 
-            var domain = builder.HostEnvironment.BaseAddress.Trim('/').Trim('\n').Replace("\n", "")           // Entfernt alle Zeilenumbrüche
-    .Replace("\r", "");
+    //        var domain = builder.HostEnvironment.BaseAddress.Trim('/').Trim('\n').Replace("\n", "")          
+    //.Replace("\r", "");
 
-            httpClient.DefaultRequestHeaders.Add("Origin", domain);
+    //        httpClient.DefaultRequestHeaders.Add("Origin", domain);
 
             builder.Services.AddScoped(sp => httpClient);
             builder.Services.AddSingleton<Container>();

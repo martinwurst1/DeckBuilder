@@ -4,6 +4,8 @@
     {
         public string Input { get; set; }
 
+        public string DeckName { get; set; }
+
         public List<Card> Data { get; set; } = new();
     }
 }

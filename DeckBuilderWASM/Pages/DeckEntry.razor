@@ -13,7 +13,7 @@
     <form>
         <div class="form-group">
             <label for="exampleTextarea" class="mt-2">Deckliste eingeben: z.B. 1 Shivan Dragon</label>
-            <input type="text" class="form-control mb-3" placeholder="Deckname" aria-label="Username" aria-describedby="basic-addon1">
+            <input type="text" class="form-control mb-3" @bind="deckname" placeholder="Deckname" aria-label="Username" aria-describedby="basic-addon1">
             <textarea class="form-control mb-3" id="exampleTextarea" @bind="deckinput" rows="100"></textarea>
         </div>
         <button class="btn btn-secondary btn-sm" @onclick="OkButtonClick">OK</button>
@@ -24,12 +24,14 @@
 
 @code {
     string deckinput;
+    string deckname;
 
     private void OkButtonClick()
     {
         if (String.IsNullOrWhiteSpace(deckinput))
             return;
         container.Input = deckinput;
+        container.DeckName = deckname;
         navigation.NavigateTo("/deckview");
     }
 }
