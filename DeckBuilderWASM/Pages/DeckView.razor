@@ -47,43 +47,40 @@
         {
             if (String.IsNullOrEmpty(card))
                 continue;
-            try
+
+            if (!Int32.TryParse(card.Trim().Substring(0, 1), out var anzahl))
             {
-                if (!Int32.TryParse(card.Trim().Substring(0, 1), out var anzahl))
-                {
-                    problems.Add(card);
-                    continue;
-                }
-                var name = GetCorrectedInput(card.Substring(1));
-                var result = await Http.GetFromJsonAsync<ApiCardResult>($"https://api.scryfall.com/cards/named?exact={name}");
-                if (result != null)
-                    cards.Add(new Card(result, name, anzahl));
-                else
-                    problems.Add(card);
-                await Task.Delay(100);
-                if (cards.Count % 4 == 0)
-                    StateHasChanged();
+                problems.Add(card);
+                continue;
             }
-            catch (Exception e)
-            {
-                throw;
-            }
+            var name = GetCorrectedInput(card.Substring(1));
+            var result = await Http.GetFromJsonAsync<ApiCardResult>($"https://api.scryfall.com/cards/named?exact={name}");
+            if (result != null)
+                cards.Add(new Card(result, name, anzahl));
+            else
+                problems.Add(card);
+            await Task.Delay(100);
+            if (cards.Count % 4 == 0)
+                StateHasChanged();
         }
         container.Data = cards;
         StateHasChanged();
         this.LoadAllImages();
     }
 
-    private async Task LoadAllImages(){
+    private async Task LoadAllImages()
+    {
         foreach (var card in this.cards.Where(c => c.Image == null || c.Image.Length == 0))
             await this.LoadImage(card);
     }
 
-    private async Task LoadImage(Card card){
+    private async Task LoadImage(Card card)
+    {
         card.Image = await Http.GetByteArrayAsync($"https://api.scryfall.com/cards/named?exact={card.Name}&format=image&set={card.SelectedVersion.Set}");
         await Task.Delay(100);
     }
 
+  
     private async Task ExportPictures()
     {
         await this.LoadAllImages();
