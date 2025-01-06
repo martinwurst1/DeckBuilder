@@ -21,7 +21,7 @@ namespace DeckBuilderWASM
     //.Replace("\r", "");
 
     //        httpClient.DefaultRequestHeaders.Add("Origin", domain);
-
+            
             builder.Services.AddScoped(sp => httpClient);
             builder.Services.AddSingleton<Container>();
             await builder.Build().RunAsync();
