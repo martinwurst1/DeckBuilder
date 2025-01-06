@@ -8,7 +8,8 @@
 @inject Container container
 
 <div class="container">
-    @if (problems.Count > 0){
+    @if (problems.Count > 0)
+    {
         <div class="row">
             <div class="h6">Folgende Karten wurden nicht gefunden:</div>
         </div>
@@ -18,7 +19,7 @@
         @foreach (var card in this.cards)
         {
             <div class="col-md-3 mb-3">
-                <DeckBuilderWASM.Components.CardSelection Card="@card"/>
+                <DeckBuilderWASM.Components.CardSelection Card="@card" />
             </div>
         }
     </div>
@@ -48,7 +49,7 @@
                 continue;
             try
             {
-                if (!Int32.TryParse(card.Trim().Substring(0,1), out var anzahl))
+                if (!Int32.TryParse(card.Trim().Substring(0, 1), out var anzahl))
                 {
                     problems.Add(card);
                     continue;
@@ -70,39 +71,47 @@
         }
         container.Data = cards;
         StateHasChanged();
+        this.LoadAllImages();
     }
 
-    private async Task ExportPictures(){
+    private async Task LoadAllImages(){
+        foreach (var card in this.cards.Where(c => c.Image == null || c.Image.Length == 0))
+            await this.LoadImage(card);
+    }
 
-        foreach(var card in this.cards.Where(c => c.Image == null || c.Image.Length == 0)){
-            card.Image = await Http.GetByteArrayAsync(card.SelectedVersion.ImageUris.Normal);
-            await Task.Delay(100);
-        }
+    private async Task LoadImage(Card card){
+        card.Image = await Http.GetByteArrayAsync($"https://api.scryfall.com/cards/named?exact={card.Name}&format=image&set={card.SelectedVersion.Set}");
+        await Task.Delay(100);
+    }
+
+    private async Task ExportPictures()
+    {
+        await this.LoadAllImages();
 
         var imagesToExport = new List<byte[]>();
 
-        foreach(var card in this.cards){
+        for (int k = 0; k < this.cards.Count; k++)
+        {
+            var card = this.cards[k];
             for (int i = 0; i < card.Anzahl; i++)
                 imagesToExport.Add(card.Image);
         }
 
         foreach (var chunk in imagesToExport.Chunk(2))
         {
-                byte[] finalImage;
+            byte[] finalImage;
 
-                using (var resultStream = await ImageProcessor.ProcessImagesWithImageSharp(chunk[0], chunk.Length > 1 ? chunk[1] : null))
-                {
-                    finalImage = resultStream.ToArray();
-                }
-                if (finalImage != null)
-                    await this.SaveFile(finalImage, "Pics.jpg");
+            using (var resultStream = await ImageProcessor.ProcessImagesWithImageSharp(chunk[0], chunk.Length > 1 ? chunk[1] : null))
+            {
+                finalImage = resultStream.ToArray();
             }
+            if (finalImage != null)
+                await this.SaveFile(finalImage, "Pics.jpg");
         }
-    
+    }
 
-  
-
-    private async Task Save(){
+    private async Task Save()
+    {
         var fileName = String.IsNullOrEmpty(this.container.DeckName) ? "deck.json" : $"{this.container.DeckName}.json";
         var byteArray = JsonSerializer.SerializeToUtf8Bytes(container);
         var blob = await JS.InvokeAsync<IJSObjectReference>("createBlob", byteArray);
@@ -129,7 +138,8 @@
         await JS.InvokeVoidAsync("URL.revokeObjectURL", url);
     }
 
-    private static string GetCorrectedInput(string input){
+    private static string GetCorrectedInput(string input)
+    {
         return input.Replace("'", String.Empty).Replace(",", String.Empty).Trim();
     }
 }

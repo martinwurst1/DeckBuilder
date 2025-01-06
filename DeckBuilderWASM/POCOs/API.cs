@@ -51,8 +51,8 @@
         //[JsonPropertyName("colors")]
         //public List<string> Colors { get; set; }
 
-        //[JsonPropertyName("set")]
-        //public string Set { get; set; }
+        [JsonPropertyName("set")]
+        public string Set { get; set; }
 
         //[JsonPropertyName("rarity")]
         //public string Rarity { get; set; }
