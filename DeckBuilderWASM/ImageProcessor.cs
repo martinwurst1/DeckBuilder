@@ -12,6 +12,7 @@ namespace DeckBuilderWASM
         const int obererAbstand = 50;
         public static async Task<MemoryStream> ProcessImagesWithImageSharp(byte[] imageBytes1, byte[] imageBytes2)
         {
+            await Task.Delay(10_000);
             var outputStream = new MemoryStream();
             int totalHeight = 815;
             int totalWidth = 1059;
@@ -21,8 +22,7 @@ namespace DeckBuilderWASM
             using (Image<Rgba32> resultImage = new Image<Rgba32>(totalWidth, totalHeight))
             {
                 resultImage.Mutate(i => i.BackgroundColor(Color.White));
-
-                image1.Mutate(i => i.Resize(500, 700));               
+                image1.Mutate(i => i.Resize(500, 700));
                 resultImage.Mutate(ctx => ctx.DrawImage(image1, new Point(aeussererAbstand, obererAbstand), 1f));
 
                 if (image2 != null)
@@ -31,7 +31,7 @@ namespace DeckBuilderWASM
                     resultImage.Mutate(ctx => ctx.DrawImage(image2, new Point(image1.Width + aeussererAbstand + innererAbstand, obererAbstand), 1f));
                 }
 
-                resultImage.Save(outputStream, new JpegEncoder());
+                await resultImage.SaveAsync(outputStream, new JpegEncoder());
             }
 
             return outputStream;
