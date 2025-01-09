@@ -3,6 +3,7 @@
 @using System.Text.Json;
 @using System.IO
 @using System.Reflection.Metadata
+@using System.Text.RegularExpressions
 @inject IJSRuntime JS
 @inject HttpClient Http
 @inject Container container
@@ -94,13 +95,22 @@
         {
             if (String.IsNullOrEmpty(card))
                 continue;
+            
+            var regex = new Regex(@"^\d+");
 
-            if (!Int32.TryParse(card.Trim().Substring(0, 1), out var anzahl))
+            var match = regex.Match(card);
+
+            if (!match.Success){
+                problems.Add(card);
+                continue;
+            }
+
+            if (!Int32.TryParse(card.Trim().Substring(0, match.Value.Length), out var anzahl))
             {
                 problems.Add(card);
                 continue;
             }
-            var name = GetCorrectedInput(card.Substring(1));
+            var name = GetCorrectedInput(card.Substring(match.Value.Length));
             var result = await Http.GetFromJsonAsync<ApiCardResult>($"https://api.scryfall.com/cards/named?exact={name}");
             if (result != null)
                 cards.Add(new Card(result, name, anzahl));
