@@ -14,6 +14,6 @@ namespace DeckBuilderWASM.POCOs
 
         public int Anzahl { get; set; } = anzahl;
 
-        public byte[] Image { get; set; }
+        public byte[] Image { get; set; } 
     }
 }
