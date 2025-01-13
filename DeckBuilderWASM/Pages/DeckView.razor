@@ -12,7 +12,10 @@
     @if (problems.Count > 0)
     {
         <div class="row">
-            <div class="h6">Folgende Karten wurden nicht gefunden:</div>
+            <div class="h4">Folgende Karten wurden nicht gefunden:</div>
+            @foreach(var problem in this.problems){
+                <div>@problem</div>
+            }
         </div>
     }
 
@@ -95,26 +98,28 @@
         {
             if (String.IsNullOrEmpty(card))
                 continue;
-            
+
             var regex = new Regex(@"^\d+");
 
             var match = regex.Match(card);
+            var anzahl = 1;
 
-            if (!match.Success){
-                problems.Add(card);
-                continue;
-            }
+            if (match.Success)
+                anzahl = Int32.Parse(card.Trim().Substring(0, match.Value.Length));
 
-            if (!Int32.TryParse(card.Trim().Substring(0, match.Value.Length), out var anzahl))
-            {
-                problems.Add(card);
-                continue;
-            }
             var name = GetCorrectedInput(card.Substring(match.Value.Length));
-            var result = await Http.GetFromJsonAsync<ApiCardResult>($"https://api.scryfall.com/cards/named?exact={name}");
+            ApiCardResult result = null;
+            try
+            {
+                result = await Http.GetFromJsonAsync<ApiCardResult>($"https://api.scryfall.com/cards/named?exact={name}");
+            }
+            catch (Exception)
+            {
+                this.problems.Add(card);
+            }
             if (result != null)
                 cards.Add(new Card(result, name, anzahl));
-            else
+            else if (!problems.Contains(card))
                 problems.Add(card);
             await Task.Delay(100);
             if (cards.Count % 4 == 0)
@@ -156,8 +161,8 @@
         var imageChunks = imagesToExport.Chunk(2).ToList();
 
         for (int i = 0; i < imageChunks.Count; i++)
-        {            
-            this.aktuellerStand = $"Starte Bildverarbeitung von Bild {i+1}";
+        {
+            this.aktuellerStand = $"Starte Bildverarbeitung von Bild {i + 1}";
             this.StateHasChanged();
             await CombineImages(imageChunks[i], i, imageChunks.Count).ConfigureAwait(false);
         }
@@ -168,7 +173,7 @@
     private async Task CombineImages(byte[][] images, int currentNumber, int maxNumber)
     {
         byte[] finalImage;
-        var current = currentNumber.ToString().PadLeft(maxNumber.ToString().Length);
+        var current = (currentNumber +1).ToString().PadLeft(maxNumber.ToString().Length);
         var filename = $"{this.container.DeckName}_{current}-{maxNumber}.jpg";
         using (var resultStream = await ImageProcessor.ProcessImagesWithImageSharp(images[0], images.Length > 1 ? images[1] : null))
         {
