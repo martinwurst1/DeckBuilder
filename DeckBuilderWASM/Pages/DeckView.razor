@@ -43,7 +43,7 @@
     }
 
     <div class="row">
-        @foreach (var card in this.cards)
+        @foreach (var card in this.container.Data)
         {
             <div class="col-md-3 mb-3">
                 <DeckBuilderWASM.Components.CardSelection Card="@card" />
@@ -87,12 +87,19 @@
 
     #endregion
 
-    List<Card> cards = new();
     List<string> problems = new();
     string aktuellerStand;
 
     protected override async Task OnInitializedAsync()
     {
+        if (this.container.Data == null || this.container.Data.Count == 0)
+            await LoadInitialCards();
+        StateHasChanged();
+        this.LoadAllImages();
+    }
+
+    private async Task LoadInitialCards(){
+        this.container.Data = new();
         var split = container.Input.Split(['\n']).Select(GetCorrectedInput);
         foreach (var card in split)
         {
@@ -118,21 +125,18 @@
                 this.problems.Add(card);
             }
             if (result != null)
-                cards.Add(new Card(result, name, anzahl));
+                this.container.Data.Add(new Card(result, name, anzahl));
             else if (!problems.Contains(card))
                 problems.Add(card);
             await Task.Delay(100);
-            if (cards.Count % 4 == 0)
+            if (this.container.Data.Count % 4 == 0)
                 StateHasChanged();
         }
-        container.Data = cards;
-        StateHasChanged();
-        this.LoadAllImages();
     }
 
     private async Task LoadAllImages()
     {
-        foreach (var card in this.cards.Where(c => c.Image == null || c.Image.Length == 0))
+        foreach (var card in this.container.Data.Where(c => c.Image == null || c.Image.Length == 0))
             await this.LoadImage(card);
     }
 
@@ -150,9 +154,9 @@
 
         var imagesToExport = new List<byte[]>();
 
-        for (int k = 0; k < this.cards.Count; k++)
+        for (int k = 0; k < this.container.Data.Count; k++)
         {
-            var card = this.cards[k];
+            var card = this.container.Data[k];
             for (int i = 0; i < card.Anzahl; i++)
                 imagesToExport.Add(card.Image);
         }
