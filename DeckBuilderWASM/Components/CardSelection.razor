@@ -15,16 +15,17 @@
             <div class="modal-body">
                 @if (this.Card.ArtSearchResult != null && this.Card.ArtSearchResult.Count > 0)
                 {
+                    <div class="row">
                     @foreach (var altArt in this.Card.ArtSearchResult.Where(r => r.ImageUris != null))
                     {
-                        <div class="row">
-                            <div class="col-md-6 mb-6">
+
+                            <div class="col-md-4 mb-4">
                                 <button type="button" style="border: none;background: none" @onclick="() => SetSelectedArt(altArt)" data-toggle="modal">
                                     <img src="@altArt.ImageUris.Normal" class="img-fluid rounded" alt="Image">
                                 </button>
                             </div>
-                        </div>
-                    }
+                        }
+                    </div>
                 }
                 else {
                     <div>Keine anderen Prints gefunden.</div>

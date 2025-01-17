@@ -4,8 +4,8 @@
     {
         public string Input { get; set; }
 
-        public string DeckName { get; set; } = "Deck";
+        public string DeckName { get; set; }
 
-        public List<Card> Data { get; set; } = new();
+        public List<Card> Data { get; set; }
     }
 }
