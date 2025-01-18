@@ -124,7 +124,7 @@
             {
                 this.problems.Add(card);
             }
-            if (result != null)
+            if (result != null && result.ImageUris != null)
                 this.container.Data.Add(new Card(result, name, anzahl));
             else if (!problems.Contains(card))
                 problems.Add(card);
