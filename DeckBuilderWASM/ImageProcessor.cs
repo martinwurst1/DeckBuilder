@@ -8,7 +8,7 @@ namespace DeckBuilderWASM
     public class ImageProcessor
     {
         const int innererAbstand = 25;
-        const int aeussererAbstand = 30;
+        const int aeussererAbstand = 15;
         const int obererAbstand = 50;
         public static async Task<MemoryStream> ProcessImagesWithImageSharp(byte[] imageBytes1, byte[] imageBytes2)
         {
@@ -31,7 +31,7 @@ namespace DeckBuilderWASM
                     resultImage.Mutate(ctx => ctx.DrawImage(image2, new Point(image1.Width + aeussererAbstand + innererAbstand, obererAbstand), 1f));
                 }
 
-                await resultImage.SaveAsync(outputStream, new JpegEncoder());
+                await resultImage.SaveAsync(outputStream, new JpegEncoder { Quality = 100});
             }
 
             return outputStream;
