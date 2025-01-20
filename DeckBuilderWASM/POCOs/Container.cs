@@ -6,6 +6,8 @@
 
         public string DeckName { get; set; }
 
+        public string Language { get; set; } = "en";
+
         public List<Card> Data { get; set; }
     }
 }

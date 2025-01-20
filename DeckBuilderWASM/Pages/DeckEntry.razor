@@ -19,6 +19,18 @@
         <div class="col-md-1 mb-1">
             <div class="col-3 align-self-center"><InputFile OnChange="@OnInputFileChange" /></div>
         </div>
+        <div class="col-md-3 mb-3"/>
+        <div class="col-md-2 mb-2">
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" @onclick="() => this.isDropdownOpen = !this.isDropdownOpen">
+                    @this.GetDropdownInfo()
+                </button>
+                <ul class="dropdown-menu @dropdownClass" aria-labelledby="dropdownMenuButton">
+                    <li><a class="dropdown-item" href="#" @onclick="@(e => SetLanguage("en"))">Englisch</a></li>
+                    <li><a class="dropdown-item" href="#" @onclick="@(e => SetLanguage("de"))">Deutsch</a></li>
+                </ul>
+            </div>
+        </div>
     </div>
     <div class="row">
         <div class="col-md5 mb5">
@@ -41,6 +53,24 @@
     string deckinput;
     string deckname;
     string fehlermeldung;
+    string language;
+
+    private bool isDropdownOpen = false;
+    private string dropdownClass => isDropdownOpen ? "show" : "";
+
+    private string GetDropdownInfo(){
+        switch (this.container.Language)
+        {
+            case "en": return "Englisch";
+            case "de": return "Deutsch";
+            default: return "Fehler";
+        }
+    }
+
+    private void ToggleDropdown()
+    {
+        isDropdownOpen = !isDropdownOpen;
+    }
 
     private void OkButtonClick()
     {
@@ -51,10 +81,17 @@
         navigation.NavigateTo("/deckview");
     }
 
+    private void SetLanguage(string lang)
+    {
+        this.container.Language = lang;
+        isDropdownOpen = false;
+    }
+
     private async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
         var files = e.GetMultipleFiles(1).Where(f => f.Name.EndsWith(".json")).ToList();
-        if (files.Count != 1){
+        if (files.Count != 1)
+        {
             this.fehlermeldung = "Es darf nur eine Datei ausgewählt werden.";
             return;
         }

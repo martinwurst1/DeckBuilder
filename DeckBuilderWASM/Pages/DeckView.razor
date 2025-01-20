@@ -46,7 +46,7 @@
         @foreach (var card in this.container.Data)
         {
             <div class="col-md-3 mb-3">
-                <DeckBuilderWASM.Components.CardSelection Card="@card" />
+                <DeckBuilderWASM.Components.CardSelection Card="@card" Language="@this.container.Language" />
             </div>
         }
     </div>
@@ -118,9 +118,9 @@
             ApiCardResult result = null;
             try
             {
-                result = await Http.GetFromJsonAsync<ApiCardResult>($"https://api.scryfall.com/cards/named?exact={name}");
+                result = await Http.GetFromJsonAsync<ApiCardResult>($"https://api.scryfall.com/cards/named?exact={card}");
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 this.problems.Add(card);
             }

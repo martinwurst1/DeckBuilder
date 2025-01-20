@@ -16,8 +16,8 @@
                 @if (this.Card.ArtSearchResult != null && this.Card.ArtSearchResult.Count > 0)
                 {
                     <div class="row">
-                    @foreach (var altArt in this.Card.ArtSearchResult.Where(r => r.ImageUris != null))
-                    {
+                        @foreach (var altArt in this.Card.ArtSearchResult.Where(r => r.ImageUris != null))
+                        {
 
                             <div class="col-md-4 mb-4">
                                 <button type="button" style="border: none;background: none" @onclick="() => SetSelectedArt(altArt)" data-toggle="modal">
@@ -73,11 +73,14 @@
     [Parameter]
     public Card Card { get; set; }
 
+    [Parameter]
+    public string Language { get; set; }
+
     public async Task LoadAlternativeArts()
     {
         try
         {
-            var result = await Http.GetFromJsonAsync<ApiSearchResult>($"https://api.scryfall.com/cards/search?q={Card.Name}+unique:art");
+            var result = await Http.GetFromJsonAsync<ApiSearchResult>($"https://api.scryfall.com/cards/search?q={Card.Name}+unique:art+lang:{Language}");
             if (result != null)
                 this.Card.ArtSearchResult = result.ApiCards;
             Open();
